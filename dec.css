@@ -1,0 +1,415 @@
+/* =========================================
+   1. 基礎變數與全局設定
+   ========================================= */
+
+:root {
+    --primary-color: #2563eb;
+    /* 主色調：藍色 */
+    --secondary-color: #64748b;
+    /* 副色調：灰色 */
+    --accent-color: #f59e0b;
+    /* 強調色：橘黃 */
+    --bg-color: #f8fafc;
+    /* 背景色：淺灰藍 */
+    --cell-size: 60px;
+    /* K-map 儲存格大小 */
+    --label-width: 90px;
+    /* 左側標籤與斜線塊寬度 */
+    --label-height: 60px;
+    /* 頂部標籤與斜線塊高度 */
+}
+
+body {
+    font-family: 'Segoe UI', 'Microsoft JhengHei', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.container {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    max-width: 1250px;
+}
+
+h1 {
+    text-align: center;
+    color: #1e293b;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+}
+
+
+/* =========================================
+   2. 佈局架構 (Main Layout)
+   ========================================= */
+
+.main-layout {
+    display: flex;
+    gap: 50px;
+    align-items: flex-start;
+}
+
+.left-panel {
+    flex: 1;
+}
+
+
+/* 控制面板 (Select, Buttons) */
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px;
+    background: #f1f5f9;
+    border-radius: 12px;
+    margin-bottom: 25px;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #e2e8f0;
+    color: #475569;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #cbd5e1;
+}
+
+
+/* =========================================
+   3. K-Map 核心視覺化設計
+   ========================================= */
+
+
+/* K-Map 容器定位基準 */
+
+.kmap-container {
+    position: relative;
+    display: inline-block;
+    margin-top: 20px;
+}
+
+
+/* 頂部列：斜線塊 + 頂部標籤 */
+
+.kmap-top-row {
+    display: flex;
+}
+
+
+/* 左上角斜線方塊 */
+
+.kmap-corner {
+    width: var(--label-width);
+    height: var(--label-height);
+    position: relative;
+    border: 2px solid #334155;
+    background: #f1f5f9;
+    box-sizing: border-box;
+    /* 確保邊框不撐大寬度 */
+}
+
+.kmap-corner .slash {
+    position: absolute;
+    width: 110px;
+    /* 長度需大於對角線 */
+    height: 2px;
+    background: #334155;
+    top: 0;
+    left: 0;
+    transform: rotate(33.5deg);
+    /* 針對 90x60 矩形的精確角度 */
+    transform-origin: top left;
+}
+
+.kmap-corner .var-cd {
+    position: absolute;
+    right: 8px;
+    top: 5px;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.kmap-corner .var-ab {
+    position: absolute;
+    left: 8px;
+    bottom: 5px;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+
+/* 頂部 Gray Code 標籤 */
+
+#top-label {
+    display: grid;
+    height: var(--label-height);
+    box-sizing: border-box;
+}
+
+
+/* 左側標籤與網格的行 */
+
+.kmap-middle-row {
+    display: flex;
+}
+
+
+/* 左側 Gray Code 標籤 */
+
+#left-label {
+    display: grid;
+    width: var(--label-width);
+    box-sizing: border-box;
+}
+
+
+/* 標籤通用文字樣式 */
+
+.label-container div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+}
+
+
+/* 橫向標籤單個格子對齊 */
+
+#top-label div {
+    width: var(--cell-size);
+    line-height: 1.2;
+}
+
+
+/* 縱向標籤單個格子對齊 */
+
+#left-label div {
+    height: var(--cell-size);
+    flex-direction: row;
+    /* 讓 A'B' 與 00 水平排列 */
+    justify-content: flex-end;
+    padding-right: 12px;
+    gap: 8px;
+}
+
+
+/* 網格本體 */
+
+#kmap-grid {
+    display: grid;
+    border: 2px solid #334155;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+
+/* 單個儲存格 (Cell) */
+
+.cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    border: 1px solid #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    box-sizing: border-box;
+    transition: background 0.2s;
+}
+
+.cell:hover {
+    background: #f8fafc;
+}
+
+
+/* 儲存格內容 (0/1) */
+
+.cell::after {
+    font-size: 1.5rem;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.cell.active {
+    background-color: #eff6ff;
+}
+
+.cell.active::after {
+    content: "1";
+    color: var(--primary-color);
+}
+
+.cell:not(.active)::after {
+    content: "0";
+    color: #cbd5e1;
+}
+
+
+/* 格子右上方的小數字 (Minterm Index) */
+
+.cell-index {
+    position: absolute;
+    top: 2px;
+    right: 5px;
+    font-size: 0.65rem;
+    color: #94a3b8;
+}
+
+
+/* =========================================
+   4. 分組圈選動畫 (Group Overlays)
+   ========================================= */
+
+.group-overlay {
+    position: absolute;
+    pointer-events: none;
+    /* 不干擾格子點擊 */
+    z-index: 10;
+    border: 4px dashed;
+    /* 粗虛線框 */
+    border-radius: 18px;
+    /* 圓角更美觀 */
+    box-sizing: border-box;
+    opacity: 0;
+    transform: scale(0.95);
+    animation: groupPopIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes groupPopIn {
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+/* 繞環模式不顯示背景色 */
+
+.group-overlay.wraparound {
+    background-color: transparent !important;
+}
+
+
+/* =========================================
+   5. 結果面板與數學過程
+   ========================================= */
+
+.output-panel {
+    margin-top: 35px;
+    padding-top: 25px;
+    border-top: 2px solid #f1f5f9;
+}
+
+.result-box h3 {
+    margin-bottom: 10px;
+    color: #475569;
+}
+
+.result-box code {
+    display: block;
+    padding: 20px;
+    background: #1e293b;
+    color: #38bdf8;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    font-family: 'Consolas', 'Monaco', monospace;
+    letter-spacing: 1px;
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.process-box {
+    margin-top: 20px;
+    background: #f8fafc;
+    border-left: 5px solid var(--primary-color);
+    padding: 20px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    color: #334155;
+    line-height: 1.8;
+    font-size: 0.95rem;
+    white-space: pre-wrap;
+}
+
+
+/* =========================================
+   6. 右側對照表 (Side Table)
+   ========================================= */
+
+.side-table {
+    width: 320px;
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.side-table h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    color: #1e293b;
+    text-align: center;
+}
+
+.side-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.side-table th {
+    background: #f8fafc;
+    color: #64748b;
+    font-weight: bold;
+    padding: 10px 5px;
+    font-size: 0.85rem;
+    border-bottom: 2px solid #e2e8f0;
+    text-align: center;
+}
+
+.side-table td {
+    padding: 8px 5px;
+    text-align: center;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.9rem;
+}
+
+
+/* 特殊欄位強調 */
+
+.side-table td:nth-child(3) {
+    /* State 欄位 */
+    font-family: 'Consolas', monospace;
+    color: var(--primary-color);
+    font-weight: bold;
+}

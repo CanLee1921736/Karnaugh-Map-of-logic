@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>互動式 K-Map 學習工具</title>
+    <link rel="stylesheet" href="dec.css">
+</head>
+
+<body>
+    <div style="position: absolute; top: 10px; right: 10px; text-align: right; font-family: sans-serif;">
+        <div>(editor by 林建承)</div>
+        <div>114321019</div>
+    </div>
+    <div class="container">
+        <h1>Karnaugh Map 化簡工具</h1>
+
+        <div class="main-layout">
+            <div class="left-panel">
+
+                <section class="controls">
+                    <div class="input-group">
+                        <label for="var-select">變數數量：</label>
+                        <select id="var-select">
+                            <option value="2">2 個變數 (A, B)</option>
+                            <option value="3">3 個變數 (A, B, C)</option>
+                            <option value="4" selected>4 個變數 (A, B, C, D)</option>
+                        </select>
+                    </div>
+                    <div class="button-group">
+                        <button id="btn-clear" class="btn-secondary">清空地圖</button>
+                        <button id="btn-solve" class="btn-primary">開始化簡</button>
+                    </div>
+                </section>
+
+                <div class="kmap-container">
+                    <div class="kmap-top-row">
+                        <div class="kmap-corner">
+                            <span class="var-cd">CD</span>
+                            <div class="slash"></div>
+                            <span class="var-ab">AB</span>
+                        </div>
+                        <div id="top-label" class="label-container">
+                        </div>
+                    </div>
+
+                    <div class="kmap-middle-row">
+                        <div id="left-label" class="label-container flex-column">
+                        </div>
+                        <div id="kmap-grid"></div>
+                    </div>
+                </div>
+
+                <section class="output-panel">
+                    <div class="result-box">
+                        <h3>最簡 SOP 式：</h3>
+                        <code id="sop-result">等待輸入...</code>
+                    </div>
+
+                    <div class="explanation-box">
+                        <h3>數學化簡過程 (Algebraic Steps):</h3>
+                        <div id="algebraic-process" class="process-box">
+                            請在上方地圖選取 Minterms 並點擊「開始化簡」。
+                        </div>
+                        <ul id="step-list" style="display:none;"></ul>
+                    </div>
+                </section>
+            </div>
+
+            <aside class="side-table">
+                <h3>Gray Code 對照表</h3>
+                <table id="reference-table">
+                    <thead>
+                        <tr>
+                            <th>Index</th>
+                            <th>Binary</th>
+                            <th>State</th>
+                            <th>Gray</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </aside>
+        </div>
+    </div>
+
+    <script src="interect.js"></script>
+</body>
+
+</html>
